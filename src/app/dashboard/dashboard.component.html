@@ -1,0 +1,97 @@
+<img class="head-img" src="/assets/img/head-img.jpg" alt="">
+
+<div class="container my-4">
+
+  <h1 class="text-center mb-4 text-primary ">Welcome to the Online Classroom</h1>
+
+
+  <div class="row">
+
+    <div *ngFor="let class of classes" class="col-md-4">
+      <div class="card">
+        <img src="{{ class.path }}" class="card-img-top" alt="Student Image">
+        <div class="card-body">
+          <h5 class="card-title">{{ class.name }} Class </h5>
+
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <p-tag [value]="class.status" [severity]="getSeverity(class.status)" (click)="toggleStatus(class)"
+              [ngStyle]="{ 'cursor': 'pointer' }"></p-tag>
+
+            <p *ngIf="classPresentCounts[class.id] > 0" class="m-0">Attendance: <span
+                class="fs-5 text-primary">{{classPresentCounts[class.id] }}</span></p>
+          </div>
+          <div class="d-flex align-items-center justify-content-between mt-3">
+            <button class="btn btn-primary" [disabled]="class.status === 'Completed'"
+              (click)="showUploadDialog(class.students)">Upload Student File</button>
+            <button class="btn btn-secondary" [disabled]="class.status === 'Completed'"
+              (click)="showAttendanceDialog(class.students)">Attendance Record</button>
+          </div>
+          <button type="button" class="btn btn-link fs-5 text-center w-100"
+            [class.text-danger]="class.status === 'Completed'" [disabled]="class.status === 'Completed'"
+            (click)="openTeamsLink(class.link)">
+            Attend to class
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <p-dialog header="Upload files" [(visible)]="visibleUploadDialog" [style]="{width: '50vw'}">
+    <form>
+      <p-table [value]="UploadDialogStudents">
+        <!-- The table template remains the same -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Student Name</th>
+            <th>Grade</th>
+            <th>File Upload</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-student>
+          <tr>
+            <td>{{ student.studentname }}</td>
+            <td>{{ student.grade }}</td>
+            <td>
+              <p-fileUpload mode="basic" name="file" (onSelect)="onFileSelect($event, student.id)"></p-fileUpload>
+
+          </tr>
+        </ng-template>
+      </p-table>
+      <div class="w-100 text-center mt-2">
+        <button type="submit" class="btn btn-primary" (click)="uploadFiles()">Upload Files</button>
+      </div>
+    </form>
+  </p-dialog>
+
+
+  <p-dialog header="Attendance Record" [(visible)]="visibleAttendanceDialog" [style]="{ width: '50vw' }">
+    <form>
+      <p-table [value]="attendanceDialogStudents">
+        <!-- The table template remains the same -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Student Name</th>
+            <th>Grade</th>
+            <th>Present </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-student>
+          <tr>
+            <td>{{ student.studentname }}</td>
+            <td>{{ student.grade }}</td>
+            <td><input class="form-check-input" type="checkbox" [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="student.present" /> </td>
+          </tr>
+        </ng-template>
+
+      </p-table>
+      <div class="w-100 text-center mt-2">
+        <button type="submit" class="btn btn-primary" (click)="saveClass()">Record Attendance</button>
+      </div>
+
+    </form>
+
+  </p-dialog>
